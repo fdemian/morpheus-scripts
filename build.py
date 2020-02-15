@@ -1,6 +1,7 @@
-from os.path import join, isdir
+from os.path import join, isdir, isfile
 from os import makedirs, remove
 from shutil import copy2, copytree, rmtree
+import datetime
 
 # Input folders
 api_folder = r"path\to\morpheus-api"
@@ -9,16 +10,26 @@ frontend_folder = r"path\to\morpheus-frontend"
 # Destination folder
 dest_folder = r"path\to\build-folder"
 
+
+# Generate name of build folder.
+def generate_build_name(dest_folder):
+    now_date = datetime.datetime.now()
+    date_formatted = '{0}-{1}-{2}'.format(now_date.day, now_date.month, now_date.year)
+
+    return dest_folder + "_" + date_formatted
+
+
 def clear_file_structure(files, folders, destination):
     
     # Clear all files.
     for file in files:
-        remove(join(destination, file))
+        if isfile(join(destination, file)):
+            remove(join(destination, file))
 
-    # Copy all folders
+    # Remove all folders
     for folder in folders:
-        rmtree(join(destination, folder))
-
+        if isdir(join(destination, folder)):
+            rmtree(join(destination, folder))
 
 
 def copy_file_structure(files, folders, source, destination, prefix=None):
@@ -39,6 +50,13 @@ def copy_file_structure(files, folders, source, destination, prefix=None):
 
 if __name__ == "__main__":
 
+    # Create destination folder if it does not exist.
+    destination_folder = generate_build_name(dest_folder)
+
+    if not isdir(destination_folder):
+        makedirs(destination_folder)
+
+
     """
       ########################### BACKEND ###########################
     
@@ -56,12 +74,16 @@ if __name__ == "__main__":
         "requirements.txt",
         "robots.txt",
         "setup.py",
+		"config.ini",
+		"Pipfile",
+		"Pipfile.lock"
     ]
 
     backend_folders = [ "api" ]
 
-    clear_file_structure(backend_files, backend_folders, dest_folder)
-    copy_file_structure(backend_files, backend_folders, api_folder, dest_folder)
+    clear_file_structure(backend_files, backend_folders, destination_folder)
+
+    copy_file_structure(backend_files, backend_folders, api_folder, destination_folder)
 
     """    
       ########################### FRONTEND ###########################
@@ -83,7 +105,7 @@ if __name__ == "__main__":
     ]
 
     frontend_build_folder = join(frontend_folder, "build")
-    frontend_dest = join(dest_folder, "static")
+    frontend_dest = join(destination_folder, "static")
 
     # If static directory does not exist, create it.
     if not isdir(frontend_dest):
