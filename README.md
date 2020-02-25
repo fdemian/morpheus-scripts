@@ -20,13 +20,13 @@ Scripts to manage the application.
    
   2) Specify the destination folder.
 
-	```
-    # Destination folder
-    dest_folder = "/path/to/destination/<build folder name>"
-	```
+  ```
+  # Destination folder
+  dest_folder = "/path/to/destination/<build folder name>"
+  ```
  
   3) Run the build script
 
-    ```
-    python3 build.py
-	```
+  ```
+  python3 build.py
+  ```
